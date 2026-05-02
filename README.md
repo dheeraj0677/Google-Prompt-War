@@ -67,13 +67,28 @@ The project uses a centralized configuration file to manage API keys securely.
 ### 2. Local Execution
 You can run the project using any static file server:
 ```bash
-# Using npx
-npx serve public
+# Using npm
+npm install
+npm start
 ```
 Then visit `http://localhost:3000`.
 
-### 3. Deployment
-The project is ready for deployment to **Firebase Hosting**:
+### 3. Deployment to Render
+Render is a great way to host this project for free.
+
+1.  **Connect GitHub**: Create a new **Static Site** on Render and connect this repository.
+2.  **Build Settings**:
+    - **Build Command**: `npm run build`
+    - **Publish Directory**: `public`
+3.  **Environment Variables**:
+    Add the following in the Render dashboard:
+    - `GEMINI_API_KEY`: Your Google Gemini key.
+    - `GOOGLE_MAPS_API_KEY`: Your Google Maps key.
+    - `GA4_MEASUREMENT_ID`: Your GA4 ID.
+4.  **Deploy**: Render will build the site, inject your keys into the config, and host it!
+
+### 4. Deployment to Firebase
+The project is also ready for **Firebase Hosting**:
 ```bash
 firebase deploy
 ```

@@ -1,0 +1,12 @@
+{
+  "name": "electbot",
+  "version": "1.0.0",
+  "description": "AI Election Process Assistant powered by Google Gemini",
+  "scripts": {
+    "start": "serve public",
+    "build": "node inject-config.js"
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
