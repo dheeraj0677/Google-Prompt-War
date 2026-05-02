@@ -41,20 +41,66 @@
   </div>
   <script src="js/animations.js"></script>
   <script>
-    const stations=[
-      {name:"Town Hall Polling Center",area:"Mumbai",address:"Fort, Mumbai, Maharashtra 400001",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:18.9322,lng:72.8264},
-      {name:"Govt. Senior Secondary School",area:"New Delhi",address:"Barakhamba Rd, New Delhi 110001",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:28.6315,lng:77.2167},
-      {name:"Central Library Polling Station",area:"Bengaluru",address:"Cubbon Park, Bengaluru, Karnataka 560001",hours:"8:00 AM – 5:00 PM",type:"early",accessible:true,lat:12.9763,lng:77.5929},
-      {name:"Municipal Corporation Office",area:"Chennai",address:"Ripon Building, Chennai, Tamil Nadu 600003",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:false,lat:13.0827,lng:80.2707},
-      {name:"Kendriya Vidyalaya",area:"Kolkata",address:"Ballygunge, Kolkata, West Bengal 700019",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:22.5280,lng:88.3659},
-      {name:"Tehsil Office",area:"Ahmedabad",address:"Navrangpura, Ahmedabad, Gujarat 380009",hours:"8:00 AM – 5:00 PM",type:"early",accessible:true,lat:23.0338,lng:72.5466},
-      {name:"Govt. Girls School",area:"Hyderabad",address:"Banjara Hills, Hyderabad, Telangana 500034",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:false,lat:17.4156,lng:78.4347},
-      {name:"Community Centre",area:"Pune",address:"Shivajinagar, Pune, Maharashtra 411005",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:18.5308,lng:73.8475},
-      {name:"Public Public School",area:"Jaipur",address:"Malviya Nagar, Jaipur, Rajasthan 302017",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:26.8530,lng:75.8047},
-      {name:"Panchayat Bhavan",area:"Lucknow",address:"Hazratganj, Lucknow, Uttar Pradesh 226001",hours:"8:00 AM – 5:00 PM",type:"early",accessible:true,lat:26.8467,lng:80.9462}
+    const baseCities = [
+      {name:"Mumbai", lat:18.9322, lng:72.8264}, {name:"New Delhi", lat:28.6315, lng:77.2167},
+      {name:"Bengaluru", lat:12.9763, lng:77.5929}, {name:"Chennai", lat:13.0827, lng:80.2707},
+      {name:"Kolkata", lat:22.5280, lng:88.3659}, {name:"Ahmedabad", lat:23.0338, lng:72.5466},
+      {name:"Hyderabad", lat:17.4156, lng:78.4347}, {name:"Pune", lat:18.5308, lng:73.8475},
+      {name:"Jaipur", lat:26.8530, lng:75.8047}, {name:"Lucknow", lat:26.8467, lng:80.9462},
+      {name:"Bhopal", lat:23.2599, lng:77.4126}, {name:"Patna", lat:25.5941, lng:85.1376},
+      {name:"Chandigarh", lat:30.7333, lng:76.7794}, {name:"Guwahati", lat:26.1445, lng:91.7362},
+      {name:"Bhubaneswar", lat:20.2961, lng:85.8245}, {name:"Kochi", lat:9.9312, lng:76.2673},
+      {name:"Indore", lat:22.7196, lng:75.8577}, {name:"Nagpur", lat:21.1458, lng:79.0882},
+      {name:"Surat", lat:21.1702, lng:72.8311}, {name:"Visakhapatnam", lat:17.6868, lng:83.2185},
+      {name:"Srinagar", lat:34.0837, lng:74.7973}, {name:"Ranchi", lat:23.3441, lng:85.3096},
+      {name:"Raipur", lat:21.2514, lng:81.6296}, {name:"Dehradun", lat:30.3165, lng:78.0322},
+      {name:"Shimla", lat:31.1048, lng:77.1734}, {name:"Madurai", lat:9.9252, lng:78.1198},
+      {name:"Varanasi", lat:25.3176, lng:82.9739}, {name:"Amritsar", lat:31.6340, lng:74.8723},
+      {name:"Agra", lat:27.1767, lng:78.0081}, {name:"Coimbatore", lat:11.0168, lng:76.9558}
     ];
+
+    const stations = [];
+    
+    // Procedurally generate 1500+ polling stations across India
+    baseCities.forEach(city => {
+      // Main city station
+      stations.push({
+        name: `HQ Polling Center - ${city.name}`,
+        area: city.name,
+        address: `Central District, ${city.name}`,
+        hours: "7:00 AM – 6:00 PM",
+        type: "election_day",
+        accessible: true,
+        lat: city.lat,
+        lng: city.lng
+      });
+
+      // Generate 50 local booths clustered around the city (simulating villages/colonies)
+      for(let i=0; i<50; i++) {
+        // Random spread of about ~100km radius
+        const latOffset = (Math.random() - 0.5) * 1.5;
+        const lngOffset = (Math.random() - 0.5) * 1.5;
+        
+        stations.push({
+          name: `Local Booth #${Math.floor(Math.random()*9000)+1000}`,
+          area: `${city.name} Outskirts`,
+          address: `Ward ${Math.floor(Math.random()*50)+1}, ${city.name} Region`,
+          hours: "7:00 AM – 6:00 PM",
+          type: Math.random() > 0.85 ? "early" : "election_day",
+          accessible: Math.random() > 0.4,
+          lat: city.lat + latOffset,
+          lng: city.lng + lngOffset
+        });
+      }
+    });
+
     let cf='all';
-    function renderSt(l){const c=document.getElementById('stationList');if(!l.length){c.innerHTML='<p style="text-align:center;color:var(--text-tertiary);padding:var(--space-xl)">No stations found.</p>';return;}c.innerHTML=l.map((s,i)=>`<div class="station-card" onclick="document.querySelectorAll('.station-card').forEach(c=>c.style.borderColor='');this.style.borderColor='var(--gold)'"><div style="display:flex;align-items:flex-start;gap:var(--space-sm)"><span class="material-symbols-outlined" style="color:var(--gold);font-size:20px;margin-top:2px">location_on</span><div style="flex:1"><strong style="font-size:.875rem">${s.name}</strong><p style="font-size:.75rem;color:var(--text-tertiary);margin:2px 0">${s.address}</p><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><span class="chip" style="padding:2px 8px;font-size:.625rem">${s.type==='early'?'🟢 Early':'🔵 Election Day'}</span>${s.accessible?'<span class="chip" style="padding:2px 8px;font-size:.625rem">♿ Accessible</span>':''}<span class="chip" style="padding:2px 8px;font-size:.625rem">🕐 ${s.hours}</span></div></div></div><a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}" target="_blank" rel="noopener" class="btn btn-tonal" style="margin-top:var(--space-sm);width:100%;justify-content:center;padding:8px;font-size:.75rem" onclick="event.stopPropagation()"><span class="material-symbols-outlined" style="font-size:14px">directions</span>Get Directions</a></div>`).join('');}
+    // Max 50 items in sidebar for performance, but all 1500 on map
+    function renderSt(l){const c=document.getElementById('stationList');if(!l.length){c.innerHTML='<p style="text-align:center;color:var(--text-tertiary);padding:var(--space-xl)">No stations found.</p>';return;}
+    const displayList = l.slice(0, 50); // Only render top 50 in HTML list to prevent DOM lag
+    c.innerHTML=displayList.map((s,i)=>`<div class="station-card" onclick="document.querySelectorAll('.station-card').forEach(c=>c.style.borderColor='');this.style.borderColor='var(--gold)'; map.setView([${s.lat}, ${s.lng}], 14)"><div style="display:flex;align-items:flex-start;gap:var(--space-sm)"><span class="material-symbols-outlined" style="color:var(--gold);font-size:20px;margin-top:2px">location_on</span><div style="flex:1"><strong style="font-size:.875rem">${s.name}</strong><p style="font-size:.75rem;color:var(--text-tertiary);margin:2px 0">${s.address}</p><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><span class="chip" style="padding:2px 8px;font-size:.625rem">${s.type==='early'?'🟢 Early':'🔵 Election Day'}</span>${s.accessible?'<span class="chip" style="padding:2px 8px;font-size:.625rem">♿ Accessible</span>':''}<span class="chip" style="padding:2px 8px;font-size:.625rem">🕐 ${s.hours}</span></div></div></div><a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}" target="_blank" rel="noopener" class="btn btn-tonal" style="margin-top:var(--space-sm);width:100%;justify-content:center;padding:8px;font-size:.75rem" onclick="event.stopPropagation()"><span class="material-symbols-outlined" style="font-size:14px">directions</span>Get Directions</a></div>`).join('');
+    if(l.length > 50) c.innerHTML += `<p style="text-align:center;font-size:12px;color:var(--text-tertiary);margin-top:10px">+ ${l.length - 50} more stations. Use the map to explore.</p>`;
+    }
     function filterSt(t,b){document.querySelectorAll('.map-sidebar .chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');cf=t;const filtered = t==='all'?stations:t==='accessible'?stations.filter(s=>s.accessible):stations.filter(s=>s.type===t);renderSt(filtered);updateMarkers(filtered);}
     function searchSt(q){const l=q.toLowerCase();const filtered = stations.filter(s=>(cf==='all'||s.type===cf||(cf==='accessible'&&s.accessible))&&(s.name.toLowerCase().includes(l)||s.area.toLowerCase().includes(l)));renderSt(filtered);updateMarkers(filtered);}
     renderSt(stations);
@@ -82,17 +128,19 @@
       if (!markersLayer) return;
       markersLayer.clearLayers();
       
+      // Use L.circleMarker for high performance rendering of thousands of points
       filteredStations.forEach(s => {
         const color = s.type === 'early' ? '#4ade80' : '#4a9eff';
-        const markerHtml = `<div style="background-color: ${color}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4);"></div>`;
-        const icon = L.divIcon({
-          html: markerHtml,
-          className: 'custom-leaflet-marker',
-          iconSize: [20, 20],
-          iconAnchor: [10, 10]
+        
+        const marker = L.circleMarker([s.lat, s.lng], {
+          radius: 5,
+          fillColor: color,
+          color: '#ffffff',
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
         });
 
-        const marker = L.marker([s.lat, s.lng], { icon: icon });
         marker.bindPopup(`<div style="color:#333;padding:5px;font-family:var(--font-sans)"><strong>${s.name}</strong><p style="margin:5px 0 0;font-size:12px">${s.address}</p></div>`);
         markersLayer.addLayer(marker);
       });
