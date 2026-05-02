@@ -2,6 +2,7 @@
   "name": "electbot",
   "version": "1.0.0",
   "description": "AI Election Process Assistant powered by Google Gemini",
+  "license": "MIT",
   "scripts": {
     "start": "serve public",
     "build": "node inject-config.js"
