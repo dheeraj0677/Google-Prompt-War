@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="js/config.js"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Voting Plan — ElectBot</title>
+  <link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/material.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA4_MEASUREMENT_ID}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    if (typeof CONFIG !== "undefined" && CONFIG.GA4_MEASUREMENT_ID && CONFIG.GA4_MEASUREMENT_ID !== "G-XXXXXXXXXX") {
+      gtag("config", CONFIG.GA4_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body>
+  <div class="bg-gradient"></div><canvas id="particleCanvas"></canvas><div class="topo-overlay"></div>
+  <nav class="navbar" id="navbar"><a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a><button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="chat.html">AI Chat</a></li><li><a href="timeline.html">Timeline</a></li><li><a href="guide.html">Voter Guide</a></li><li><a href="quiz.html">Quiz</a></li><li><a href="news.html">News</a></li><li><a href="map.html">Find Polls</a></li><li><a href="plan.html" class="active">My Plan</a></li></ul><button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button></nav>
+  <main class="page-content">
+    <div class="container" style="max-width:700px">
+      <div style="text-align:center;margin-bottom:var(--space-2xl)">
+        <div class="hero-badge"><span class="material-symbols-outlined" style="font-size:16px">edit_note</span>Personal Plan</div>
+        <h1 style="margin-top:var(--space-md)">My Voting <span class="text-gradient">Plan</span></h1>
+        <p style="margin:var(--space-sm) auto 0">Create your personal voting plan to stay prepared.</p>
+      </div>
+      <div id="savedPlanView" style="display:none">
+        <div class="card" style="padding:var(--space-2xl);border-color:var(--mint)">
+          <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-xl)"><span class="material-symbols-outlined" style="font-size:32px;color:var(--mint)">check_circle</span><div><h3 style="font-family:var(--font-heading);margin:0">Your Plan is Ready!</h3><p style="font-size:.8125rem;color:var(--text-tertiary);margin:0">Last updated: <span id="planDate"></span></p></div></div>
+          <div id="planSummary" style="display:grid;gap:var(--space-md)"></div>
+          <div style="display:flex;gap:var(--space-md);margin-top:var(--space-xl);flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="editPlan()"><span class="material-symbols-outlined">edit</span>Edit</button>
+            <button class="btn btn-tonal" onclick="sharePlan()"><span class="material-symbols-outlined">share</span>Share</button>
+            <button class="btn btn-tonal" onclick="addToCal()"><span class="material-symbols-outlined">calendar_month</span>Add to Calendar</button>
+          </div>
+        </div>
+      </div>
+      <div id="planFormView">
+        <div class="plan-form">
+          <div class="form-group"><label class="form-label">📋 Your Name</label><input type="text" class="input-field" id="planName" placeholder="Enter your name"></div>
+          <div class="form-group"><label class="form-label">🗳️ How do you plan to vote?</label>
+            <div class="radio-group" id="votingMethod">
+              <label class="radio-option" onclick="selRadio(this,'votingMethod')"><input type="radio" name="votingMethod" value="election_day" style="accent-color:var(--gold)"><div><strong>Election Day Voting</strong><p style="font-size:.8125rem;color:var(--text-tertiary);margin:0">Vote in person on election day</p></div></label>
+              <label class="radio-option" onclick="selRadio(this,'votingMethod')"><input type="radio" name="votingMethod" value="early" style="accent-color:var(--gold)"><div><strong>Early Voting</strong><p style="font-size:.8125rem;color:var(--text-tertiary);margin:0">Vote before election day</p></div></label>
+              <label class="radio-option" onclick="selRadio(this,'votingMethod')"><input type="radio" name="votingMethod" value="postal" style="accent-color:var(--gold)"><div><strong>Postal Ballot</strong><p style="font-size:.8125rem;color:var(--text-tertiary);margin:0">Vote by mail</p></div></label>
+            </div>
+          </div>
+          <div class="form-group"><label class="form-label">📍 Your Polling Station</label><input type="text" class="input-field" id="planStation" placeholder="Station name or address"><p class="form-hint"><a href="map.html">Find your polling station →</a></p></div>
+          <div class="form-group"><label class="form-label">🪪 Voter ID / EPIC Number</label><input type="text" class="input-field" id="planVoterId" placeholder="e.g., ABC1234567"></div>
+          <div class="form-group"><label class="form-label">⏰ Reminder</label><select class="input-field" id="planReminder"><option value="">Select preference</option><option value="1week">1 week before</option><option value="3days">3 days before</option><option value="1day">1 day before</option><option value="morning">Morning of election day</option></select></div>
+          <div class="form-group"><label class="form-label">📝 Notes</label><textarea class="input-field" id="planNotes" rows="3" placeholder="Personal notes..."></textarea></div>
+          <div class="form-group" style="display:flex;flex-direction:column;gap:var(--space-sm)">
+            <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;color:var(--text-secondary)"><input type="checkbox" id="planRegistered" style="accent-color:var(--gold);width:18px;height:18px">I have verified my voter registration</label>
+            <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;color:var(--text-secondary)"><input type="checkbox" id="planIdReady" style="accent-color:var(--gold);width:18px;height:18px">I have my Voter ID ready</label>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:16px" onclick="savePlan()"><span class="material-symbols-outlined">save</span>Save My Voting Plan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p></div></div></footer>
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="js/animations.js"></script>
+  <script>
+    function selRadio(el,g){document.querySelectorAll(`#${g} .radio-option`).forEach(o=>o.classList.remove('selected'));el.classList.add('selected');el.querySelector('input[type="radio"]').checked=true;}
+    function savePlan(){const p={name:document.getElementById('planName').value,method:document.querySelector('input[name="votingMethod"]:checked')?.value||'',station:document.getElementById('planStation').value,voterId:document.getElementById('planVoterId').value,reminder:document.getElementById('planReminder').value,notes:document.getElementById('planNotes').value,registered:document.getElementById('planRegistered').checked,idReady:document.getElementById('planIdReady').checked,savedAt:new Date().toISOString()};if(!p.name){showToast('Please enter your name','error');return;}if(!p.method){showToast('Please select voting method','error');return;}localStorage.setItem('voting-plan',JSON.stringify(p));showToast('Voting plan saved! ✨','success');showSaved(p);}
+    function showSaved(p){document.getElementById('planFormView').style.display='none';document.getElementById('savedPlanView').style.display='block';document.getElementById('planDate').textContent=new Date(p.savedAt).toLocaleDateString('en-IN',{dateStyle:'long'});const ml={election_day:'Election Day',early:'Early Voting',postal:'Postal Ballot'};const rl={'1week':'1 week before','3days':'3 days before','1day':'1 day before',morning:'Morning of'};document.getElementById('planSummary').innerHTML=`<div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);background:var(--glass);border-radius:var(--radius-md);border:1px solid var(--glass-border)"><span class="material-symbols-outlined" style="color:var(--gold)">person</span><div><strong style="font-size:.8125rem;color:var(--text-tertiary)">Name</strong><br>${p.name}</div></div><div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);background:var(--glass);border-radius:var(--radius-md);border:1px solid var(--glass-border)"><span class="material-symbols-outlined" style="color:var(--blue)">how_to_vote</span><div><strong style="font-size:.8125rem;color:var(--text-tertiary)">Method</strong><br>${ml[p.method]||p.method}</div></div>${p.station?`<div style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);background:var(--glass);border-radius:var(--radius-md);border:1px solid var(--glass-border)"><span class="material-symbols-outlined" style="color:var(--mint)">location_on</span><div><strong style="font-size:.8125rem;color:var(--text-tertiary)">Station</strong><br>${p.station}</div></div>`:''}<div style="display:flex;gap:var(--space-lg);padding:var(--space-md);background:var(--glass);border-radius:var(--radius-md);border:1px solid var(--glass-border)"><span style="font-size:.875rem">${p.registered?'✅':'❌'} Registration</span><span style="font-size:.875rem">${p.idReady?'✅':'❌'} ID Ready</span></div>`;}
+    function editPlan(){document.getElementById('savedPlanView').style.display='none';document.getElementById('planFormView').style.display='block';const p=JSON.parse(localStorage.getItem('voting-plan')||'{}');if(p.name)document.getElementById('planName').value=p.name;if(p.station)document.getElementById('planStation').value=p.station;if(p.voterId)document.getElementById('planVoterId').value=p.voterId;if(p.reminder)document.getElementById('planReminder').value=p.reminder;if(p.notes)document.getElementById('planNotes').value=p.notes;document.getElementById('planRegistered').checked=p.registered||false;document.getElementById('planIdReady').checked=p.idReady||false;if(p.method){const r=document.querySelector(`input[name="votingMethod"][value="${p.method}"]`);if(r){r.checked=true;r.closest('.radio-option').classList.add('selected');}}}
+    function sharePlan(){const p=JSON.parse(localStorage.getItem('voting-plan')||'{}');const t=`🗳️ My Voting Plan\n👤 ${p.name}\n📋 ${p.method}\n📍 ${p.station||'Not set'}`;if(navigator.share)navigator.share({title:'My Voting Plan',text:t});else{navigator.clipboard.writeText(t);showToast('Copied to clipboard!','success');}}
+    function addToCal(){const ti=encodeURIComponent('Election Day - Vote!');const de=encodeURIComponent('Remember to vote! Check your plan at ElectBot.');window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${ti}&details=${de}&dates=20290415T070000/20290415T180000`,'_blank');showToast('Opening Google Calendar...','success');}
+    const saved=localStorage.getItem('voting-plan');if(saved)showSaved(JSON.parse(saved));
+  </script>
+</body>
+</html>
+

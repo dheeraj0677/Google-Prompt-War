@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.local
+.env.*
+
+# API Configuration (Sensitive)
+public/js/config.js
+
+# Dependencies
+node_modules/
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

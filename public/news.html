@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="js/config.js"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election News — ElectBot</title>
+  <link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/material.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA4_MEASUREMENT_ID}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    if (typeof CONFIG !== "undefined" && CONFIG.GA4_MEASUREMENT_ID && CONFIG.GA4_MEASUREMENT_ID !== "G-XXXXXXXXXX") {
+      gtag("config", CONFIG.GA4_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body>
+  <div class="bg-gradient"></div><canvas id="particleCanvas"></canvas><div class="topo-overlay"></div>
+  <nav class="navbar" id="navbar"><a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a><button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="chat.html">AI Chat</a></li><li><a href="timeline.html">Timeline</a></li><li><a href="guide.html">Voter Guide</a></li><li><a href="quiz.html">Quiz</a></li><li><a href="news.html" class="active">News</a></li><li><a href="map.html">Find Polls</a></li><li><a href="plan.html">My Plan</a></li></ul><button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button></nav>
+  <main class="page-content">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:var(--space-2xl)">
+        <div class="hero-badge"><span class="material-symbols-outlined" style="font-size:16px">newspaper</span>Election News</div>
+        <h1 style="margin-top:var(--space-md)">Stay <span class="text-gradient">Informed</span></h1>
+        <p style="margin:var(--space-sm) auto 0;max-width:600px">Curated election news and updates from reliable sources.</p>
+      </div>
+      <div class="news-filters" id="newsFilters">
+        <button class="chip active" onclick="filterNews('all',this)">All</button>
+        <button class="chip" onclick="filterNews('national',this)">National</button>
+        <button class="chip" onclick="filterNews('technology',this)">Technology</button>
+        <button class="chip" onclick="filterNews('policy',this)">Policy</button>
+        <button class="chip" onclick="filterNews('awareness',this)">Awareness</button>
+      </div>
+      <div style="margin-bottom:var(--space-xl)"><input type="text" class="input-field" placeholder="Search news articles..." id="newsSearch" oninput="searchNews(this.value)"></div>
+      <div class="news-grid" id="newsGrid"></div>
+    </div>
+    <div class="container section">
+      <div style="text-align:center;margin-bottom:var(--space-2xl)"><h2>Voter Turnout <span class="text-gradient">Visualized</span></h2><p style="margin:var(--space-sm) auto 0">Historical voter turnout data from Indian general elections.</p></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:var(--space-xl)">
+        <div class="card" style="padding:var(--space-xl)"><h3 style="font-family:var(--font-heading);font-size:1rem;margin-bottom:var(--space-md);color:var(--gold)">📈 Historical Turnout by Year</h3><div id="turnoutChart" style="width:100%;height:300px"></div></div>
+        <div class="card" style="padding:var(--space-xl)"><h3 style="font-family:var(--font-heading);font-size:1rem;margin-bottom:var(--space-md);color:var(--gold)">📊 Turnout by Age Group (2024)</h3><div id="ageChart" style="width:100%;height:300px"></div></div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p><button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">🚀 Back to Top</button></div></div></footer>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    const newsArticles=[
+      {title:"ECI Launches Digital Voter ID Initiative",snippet:"The Election Commission introduces digital Voter IDs accessible via the Voter Helpline app.",source:"ECI Official",date:"2024-12-15",category:"technology",icon:"phone_android"},
+      {title:"Voter Registration Drives Across 500 Colleges",snippet:"ECI partners with universities to register first-time voters through campus drives.",source:"Times of India",date:"2024-11-20",category:"awareness",icon:"school"},
+      {title:"New AI Expenditure Monitoring System",snippet:"ECI deploys AI-based expenditure tracking to monitor candidate spending in real-time.",source:"Economic Times",date:"2024-11-10",category:"technology",icon:"monitoring"},
+      {title:"Supreme Court Upholds VVPAT Protocol",snippet:"The court maintains the 5-VVPAT per constituency verification rule.",source:"The Hindu",date:"2024-10-25",category:"policy",icon:"gavel"},
+      {title:"Record 67.4% Voter Turnout in 2024",snippet:"India records strong voter participation across 7 phases of the 18th Lok Sabha elections.",source:"NDTV",date:"2024-06-05",category:"national",icon:"trending_up"},
+      {title:"SVEEP Campaign Reaches 100M Citizens",snippet:"Systematic Voters Education and Electoral Participation program expands via social media.",source:"PIB",date:"2024-09-15",category:"awareness",icon:"campaign"},
+      {title:"Postal Ballot Extended to Senior Citizens",snippet:"Voters above 85 and persons with disabilities can now avail postal ballot facility.",source:"India Today",date:"2024-08-20",category:"policy",icon:"elderly"},
+      {title:"ECI Introduces Blockchain for Results",snippet:"Pilot project uses blockchain for secure election result transmission.",source:"Mint",date:"2024-07-10",category:"technology",icon:"security"},
+      {title:"National Voters' Day Celebrated",snippet:"January 25 marks National Voters' Day with theme 'Nothing Like Voting, I Vote for Sure'.",source:"ECI",date:"2025-01-25",category:"awareness",icon:"celebration"},
+      {title:"Women Voter Turnout Surpasses Men",snippet:"In 2024, women voter turnout exceeded men's in 12 states — a historic shift.",source:"Indian Express",date:"2024-06-10",category:"national",icon:"female"}
+    ];
+    let filteredArticles=[...newsArticles];
+    function renderNews(a){const g=document.getElementById('newsGrid');if(!a.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:var(--space-3xl);color:var(--text-tertiary)"><span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:var(--space-md)">search_off</span>No articles found.</div>';return;}g.innerHTML=a.map(x=>`<article class="news-card reveal"><div class="news-card-img"><span class="material-symbols-outlined">${x.icon}</span></div><div class="news-card-body"><div class="news-card-meta"><span class="chip" style="padding:2px 10px;font-size:.6875rem">${x.category}</span><span>${x.source}</span><span>·</span><span>${new Date(x.date).toLocaleDateString('en-IN',{month:'short',day:'numeric',year:'numeric'})}</span></div><h3>${x.title}</h3><p>${x.snippet}</p></div><div class="news-card-actions"><a href="chat.html" class="btn btn-tonal" style="padding:6px 14px;font-size:.75rem"><span class="material-symbols-outlined" style="font-size:14px">smart_toy</span>Ask ElectBot</a><button class="btn" style="padding:6px 14px;font-size:.75rem;background:none;color:var(--text-secondary)"><span class="material-symbols-outlined" style="font-size:14px">share</span>Share</button></div></article>`).join('');initScrollReveal();}
+    function filterNews(c,b){document.querySelectorAll('.news-filters .chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');filteredArticles=c==='all'?[...newsArticles]:newsArticles.filter(x=>x.category===c);renderNews(filteredArticles);}
+    function searchNews(q){const l=q.toLowerCase();renderNews(filteredArticles.filter(x=>x.title.toLowerCase().includes(l)||x.snippet.toLowerCase().includes(l)));}
+    renderNews(newsArticles);
+    // Charts
+    google.charts.load('current',{packages:['corechart']});
+    google.charts.setOnLoadCallback(()=>{
+      const bg='transparent',tc='#f0f0f5',gc='rgba(255,255,255,0.05)';
+      const td=google.visualization.arrayToDataTable([['Year','Turnout %'],['1951',45.7],['1957',47.7],['1962',55.4],['1967',61.3],['1977',60.5],['1984',64],['1991',56.7],['1998',62],['2004',58.1],['2009',58.2],['2014',66.4],['2019',67.4],['2024',65.8]]);
+      new google.visualization.LineChart(document.getElementById('turnoutChart')).draw(td,{backgroundColor:bg,colors:['#FFD700'],curveType:'function',legend:{position:'none'},chartArea:{width:'85%',height:'75%'},hAxis:{textStyle:{color:tc,fontSize:10},gridlines:{color:gc}},vAxis:{textStyle:{color:tc},gridlines:{color:gc},minValue:40,format:"#'%'"},pointSize:5,animation:{startup:true,duration:1200,easing:'out'}});
+      const ad=google.visualization.arrayToDataTable([['Age','%',{role:'style'}],['18-25',52.4,'#4A9EFF'],['26-35',61.8,'#669df6'],['36-45',68.3,'#FFD700'],['46-55',71.2,'#FFA500'],['56-65',73.5,'#00F5A0'],['65+',69.1,'#0d9488']]);
+      new google.visualization.BarChart(document.getElementById('ageChart')).draw(ad,{backgroundColor:bg,legend:{position:'none'},chartArea:{width:'75%',height:'80%'},hAxis:{textStyle:{color:tc},gridlines:{color:gc},format:"#'%'"},vAxis:{textStyle:{color:tc}},animation:{startup:true,duration:1200,easing:'out'}});
+    });
+  </script>
+</body>
+</html>
+

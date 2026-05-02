@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Polling Stations — ElectBot</title>
+  <link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/material.css">
+  <script src="js/config.js"></script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA4_MEASUREMENT_ID}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    if (typeof CONFIG !== "undefined" && CONFIG.GA4_MEASUREMENT_ID && CONFIG.GA4_MEASUREMENT_ID !== "G-XXXXXXXXXX") {
+      gtag("config", CONFIG.GA4_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <nav class="navbar" id="navbar"><a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a><button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="chat.html">AI Chat</a></li><li><a href="timeline.html">Timeline</a></li><li><a href="guide.html">Voter Guide</a></li><li><a href="quiz.html">Quiz</a></li><li><a href="news.html">News</a></li><li><a href="map.html" class="active">Find Polls</a></li><li><a href="plan.html">My Plan</a></li></ul><button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button></nav>
+  <div class="map-layout">
+    <div class="map-sidebar">
+      <h2 style="font-size:1.25rem;margin-bottom:var(--space-sm);color:var(--gold)">Polling Stations</h2>
+      <p style="font-size:.8125rem;color:var(--text-tertiary);margin-bottom:var(--space-lg)">Find your nearest polling station</p>
+      <div style="display:flex;gap:var(--space-xs);flex-wrap:wrap;margin-bottom:var(--space-lg)">
+        <button class="chip active" onclick="filterSt('all',this)">All</button>
+        <button class="chip" onclick="filterSt('election_day',this)">Election Day</button>
+        <button class="chip" onclick="filterSt('early',this)">Early Voting</button>
+        <button class="chip" onclick="filterSt('accessible',this)">♿ Accessible</button>
+      </div>
+      <input type="text" class="input-field" placeholder="Search by area..." style="margin-bottom:var(--space-md)" oninput="searchSt(this.value)">
+      <div id="stationList"></div>
+      <div style="margin-top:var(--space-lg);padding:var(--space-md);background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:var(--radius-md)"><p style="font-size:.75rem;color:var(--text-secondary);margin:0"><span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle">info</span> Sample data for demonstration.</p></div>
+    </div>
+    <div id="map" class="map-container" style="background:var(--bg-mid);display:flex;align-items:center;justify-content:center">
+      <div id="mapPlaceholder" style="text-align:center;padding:var(--space-xl)">
+        <span class="material-symbols-outlined" style="font-size:64px;color:var(--gold);opacity:.4;margin-bottom:var(--space-md);display:block">map</span>
+        <h3 style="color:var(--text-secondary)">Interactive Map</h3>
+        <p style="color:var(--text-tertiary);font-size:.875rem;margin-top:var(--space-sm)">
+          Configure your Google Maps API key in <code>js/config.js</code> to enable the interactive map.
+        </p>
+      </div>
+    </div>
+  </div>
+  <script src="js/animations.js"></script>
+  <script>
+    const stations=[
+      {name:"Govt. Senior Secondary School",area:"Connaught Place",address:"Barakhamba Rd, New Delhi, 110001",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:28.6315,lng:77.2167},
+      {name:"Community Hall, Sector 15",area:"Dwarka",address:"Sector 15, Dwarka, New Delhi, 110078",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:28.5921,lng:77.046},
+      {name:"Municipal Corporation Office",area:"Karol Bagh",address:"Ajmal Khan Rd, 110005",hours:"8:00 AM – 5:00 PM",type:"early",accessible:false,lat:28.6519,lng:77.1905},
+      {name:"Kendriya Vidyalaya",area:"Laxmi Nagar",address:"Vikas Marg, 110092",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:28.6312,lng:77.2789},
+      {name:"Tehsil Office",area:"Rohini",address:"Sector 11, Rohini, 110085",hours:"8:00 AM – 5:00 PM",type:"early",accessible:true,lat:28.7326,lng:77.1108},
+      {name:"Govt. Girls School",area:"Saket",address:"Press Enclave Marg, 110017",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:false,lat:28.5244,lng:77.2067},
+      {name:"Community Centre",area:"Janakpuri",address:"C-Block, Janakpuri, 110058",hours:"7:00 AM – 6:00 PM",type:"election_day",accessible:true,lat:28.6219,lng:77.0842}
+    ];
+    let cf='all';
+    function renderSt(l){const c=document.getElementById('stationList');if(!l.length){c.innerHTML='<p style="text-align:center;color:var(--text-tertiary);padding:var(--space-xl)">No stations found.</p>';return;}c.innerHTML=l.map((s,i)=>`<div class="station-card" onclick="document.querySelectorAll('.station-card').forEach(c=>c.style.borderColor='');this.style.borderColor='var(--gold)'"><div style="display:flex;align-items:flex-start;gap:var(--space-sm)"><span class="material-symbols-outlined" style="color:var(--gold);font-size:20px;margin-top:2px">location_on</span><div style="flex:1"><strong style="font-size:.875rem">${s.name}</strong><p style="font-size:.75rem;color:var(--text-tertiary);margin:2px 0">${s.address}</p><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><span class="chip" style="padding:2px 8px;font-size:.625rem">${s.type==='early'?'🟢 Early':'🔵 Election Day'}</span>${s.accessible?'<span class="chip" style="padding:2px 8px;font-size:.625rem">♿ Accessible</span>':''}<span class="chip" style="padding:2px 8px;font-size:.625rem">🕐 ${s.hours}</span></div></div></div><a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}" target="_blank" rel="noopener" class="btn btn-tonal" style="margin-top:var(--space-sm);width:100%;justify-content:center;padding:8px;font-size:.75rem" onclick="event.stopPropagation()"><span class="material-symbols-outlined" style="font-size:14px">directions</span>Get Directions</a></div>`).join('');}
+    function filterSt(t,b){document.querySelectorAll('.map-sidebar .chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');cf=t;renderSt(t==='all'?stations:t==='accessible'?stations.filter(s=>s.accessible):stations.filter(s=>s.type===t));}
+    function searchSt(q){const l=q.toLowerCase();renderSt(stations.filter(s=>(cf==='all'||s.type===cf||(cf==='accessible'&&s.accessible))&&(s.name.toLowerCase().includes(l)||s.area.toLowerCase().includes(l))));}
+    renderSt(stations);
+
+    // Google Maps Integration
+    let map;
+    const markers = [];
+
+    function initMap() {
+      const placeholder = document.getElementById('mapPlaceholder');
+      if (placeholder) placeholder.style.display = 'none';
+
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 28.6139, lng: 77.2090 }, // New Delhi
+        zoom: 11,
+        disableDefaultUI: false,
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: true,
+        styles: [
+          { "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] },
+          { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] },
+          { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] },
+          { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
+          { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
+          { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] },
+          { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] },
+          { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] },
+          { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] },
+          { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] },
+          { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] },
+          { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] },
+          { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] },
+          { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] },
+          { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] },
+          { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }
+        ]
+      });
+
+      stations.forEach(s => {
+        const marker = new google.maps.Marker({
+          position: { lat: s.lat, lng: s.lng },
+          map: map,
+          title: s.name,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: s.type === 'early' ? '#4ade80' : '#4a9eff',
+            fillOpacity: 1,
+            strokeWeight: 2,
+            strokeColor: '#ffffff',
+            scale: 8
+          }
+        });
+        markers.push(marker);
+        
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div style="color:#333;padding:5px"><strong>${s.name}</strong><p style="margin:5px 0 0;font-size:12px">${s.address}</p></div>`
+        });
+
+        marker.addListener("click", () => {
+          infoWindow.open(map, marker);
+        });
+      });
+    }
+
+    function loadGoogleMaps() {
+      if (typeof CONFIG !== 'undefined' && CONFIG.GOOGLE_MAPS_API_KEY && CONFIG.GOOGLE_MAPS_API_KEY !== 'YOUR_GOOGLE_MAPS_API_KEY') {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${CONFIG.GOOGLE_MAPS_API_KEY}&callback=initMap`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+  </script>
+</body>
+</html>
+

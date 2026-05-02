@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Quiz scores — users can read all (leaderboard), write only own
+    match /quiz_scores/{scoreId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Voting plans — users can only access their own
+    match /voting_plans/{planId} {
+      allow read, write: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // FAQs — public read, admin write
+    match /faqs/{faqId} {
+      allow read: if true;
+      allow write: if false; // Admin SDK only
+    }
+
+    // Rate limiting — track API calls per user
+    match /rate_limits/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

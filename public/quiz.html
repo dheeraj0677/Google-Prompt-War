@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="js/config.js"></script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Quiz — ElectBot</title>
+  <link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/material.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA4_MEASUREMENT_ID}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    if (typeof CONFIG !== "undefined" && CONFIG.GA4_MEASUREMENT_ID && CONFIG.GA4_MEASUREMENT_ID !== "G-XXXXXXXXXX") {
+      gtag("config", CONFIG.GA4_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body>
+  <div class="bg-gradient"></div><canvas id="particleCanvas"></canvas><div class="topo-overlay"></div>
+  <nav class="navbar" id="navbar"><a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a><button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button><ul class="nav-links" id="navLinks"><li><a href="index.html">Home</a></li><li><a href="chat.html">AI Chat</a></li><li><a href="timeline.html">Timeline</a></li><li><a href="guide.html">Voter Guide</a></li><li><a href="quiz.html" class="active">Quiz</a></li><li><a href="news.html">News</a></li><li><a href="map.html">Find Polls</a></li><li><a href="plan.html">My Plan</a></li></ul><button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button></nav>
+  <main class="page-content">
+    <div class="container quiz-container">
+      <div style="text-align:center;margin-bottom:var(--space-2xl)">
+        <div class="hero-badge"><span class="material-symbols-outlined" style="font-size:16px">quiz</span>Election Quiz</div>
+        <h1 style="margin-top:var(--space-md)">Test Your <span class="text-gradient">Knowledge</span></h1>
+        <p style="margin:var(--space-sm) auto 0">How well do you know the Indian election process?</p>
+      </div>
+      <div id="quizProgressArea"><div class="quiz-progress-info"><span id="questionCounter">Question 1 of 10</span><span id="scoreDisplay">Score: 0</span></div><div class="progress-bar"><div class="progress-fill" id="quizProgressFill" style="width:10%"></div></div></div>
+      <div id="quizArea" style="margin-top:var(--space-xl)"><div class="quiz-question-card" id="questionCard"></div></div>
+      <div id="resultArea" style="display:none"><div class="quiz-question-card quiz-result"><div class="quiz-score-circle" id="scoreCircle" style="--score:0"><div class="quiz-score-inner"><span class="score-num" id="finalScore">0</span><span class="score-label">out of 10</span></div></div><h2 id="resultMessage" style="margin-top:var(--space-lg)"></h2><p id="resultDescription" style="margin:var(--space-md) auto"></p><div style="display:flex;gap:var(--space-md);justify-content:center;margin-top:var(--space-xl);flex-wrap:wrap"><button class="btn btn-primary" onclick="restartQuiz()"><span class="material-symbols-outlined">refresh</span>Try Again</button><a href="chat.html" class="btn btn-secondary"><span class="material-symbols-outlined">smart_toy</span>Learn More</a></div></div></div>
+    </div>
+  </main>
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p></div></div></footer>
+  <script src="js/quiz.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    const letters=['A','B','C','D'];
+    function renderQuestion(){const q=QUIZ_QUESTIONS[currentQuestion];answered=false;document.getElementById('questionCard').innerHTML=`<div class="quiz-question">${q.question}</div><div class="quiz-options">${q.options.map((o,i)=>`<button class="quiz-option" id="opt-${i}" onclick="selectAnswer(${i})"><span class="quiz-option-letter">${letters[i]}</span><span>${o}</span></button>`).join('')}</div><div id="explanationArea"></div><div id="nextBtnArea" style="display:none;margin-top:var(--space-lg);text-align:right"><button class="btn btn-primary" onclick="nextQuestion()">${currentQuestion<QUIZ_QUESTIONS.length-1?'Next Question':'See Results'}<span class="material-symbols-outlined">arrow_forward</span></button></div>`;document.getElementById('questionCounter').textContent=`Question ${currentQuestion+1} of ${QUIZ_QUESTIONS.length}`;document.getElementById('quizProgressFill').style.width=`${(currentQuestion+1)/QUIZ_QUESTIONS.length*100}%`;}
+    function selectAnswer(i){if(answered)return;answered=true;const q=QUIZ_QUESTIONS[currentQuestion];const ok=i===q.correct;if(ok)score++;userAnswers.push({question:currentQuestion,selected:i,correct:ok});document.getElementById('scoreDisplay').textContent=`Score: ${score}`;q.options.forEach((_,j)=>{const el=document.getElementById(`opt-${j}`);el.style.pointerEvents='none';if(j===q.correct)el.classList.add('correct');else if(j===i&&!ok)el.classList.add('incorrect');});document.getElementById('explanationArea').innerHTML=`<div class="quiz-explanation"><strong>${ok?'✅ Correct!':'❌ Incorrect.'}</strong> ${q.explanation}</div>`;document.getElementById('nextBtnArea').style.display='block';}
+    function nextQuestion(){currentQuestion++;currentQuestion>=QUIZ_QUESTIONS.length?showResults():renderQuestion();}
+    function showResults(){document.getElementById('quizProgressArea').style.display='none';document.getElementById('quizArea').style.display='none';document.getElementById('resultArea').style.display='block';const p=score/QUIZ_QUESTIONS.length*100;document.getElementById('scoreCircle').style.setProperty('--score',p);document.getElementById('finalScore').textContent=score;let m,d;if(p>=90){m='🏆 Outstanding!';d="You're an election expert!";}else if(p>=70){m='🌟 Great Job!';d='Strong knowledge about elections!';}else if(p>=50){m='👍 Good Effort!';d='Keep learning with our resources!';}else{m='📚 Keep Learning!';d='Use ElectBot to boost your knowledge!';}document.getElementById('resultMessage').textContent=m;document.getElementById('resultDescription').textContent=d;const prev=JSON.parse(localStorage.getItem('quiz-scores')||'[]');prev.push({score,total:QUIZ_QUESTIONS.length,date:new Date().toISOString()});localStorage.setItem('quiz-scores',JSON.stringify(prev));}
+    function restartQuiz(){currentQuestion=0;score=0;answered=false;userAnswers=[];document.getElementById('quizProgressArea').style.display='block';document.getElementById('quizArea').style.display='block';document.getElementById('resultArea').style.display='none';document.getElementById('scoreDisplay').textContent='Score: 0';renderQuestion();}
+    renderQuestion();
+  </script>
+</body>
+</html>
+

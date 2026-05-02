@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="js/config.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Timeline — ElectBot</title>
+  <meta name="description" content="Interactive election timeline showing every phase from voter registration to inauguration.">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/material.css">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${typeof CONFIG !== 'undefined' ? CONFIG.GA4_MEASUREMENT_ID : 'G-XXXXXXXXXX'}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    if (typeof CONFIG !== 'undefined' && CONFIG.GA4_MEASUREMENT_ID && CONFIG.GA4_MEASUREMENT_ID !== 'G-XXXXXXXXXX') {
+      gtag('config', CONFIG.GA4_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body>
+  <div class="bg-gradient"></div><canvas id="particleCanvas"></canvas><div class="topo-overlay"></div>
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li><li><a href="chat.html">AI Chat</a></li>
+      <li><a href="timeline.html" class="active">Timeline</a></li><li><a href="guide.html">Voter Guide</a></li>
+      <li><a href="quiz.html">Quiz</a></li><li><a href="news.html">News</a></li>
+      <li><a href="map.html">Find Polls</a></li><li><a href="plan.html">My Plan</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button>
+  </nav>
+  <main class="page-content">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:var(--space-3xl)">
+        <div class="hero-badge"><span class="material-symbols-outlined" style="font-size:16px">timeline</span>Interactive Timeline</div>
+        <h1 style="margin-top:var(--space-md)">Election <span class="text-gradient">Timeline</span></h1>
+        <p style="margin:var(--space-md) auto 0;max-width:600px">Follow every phase of the election process. Click any milestone to learn more.</p>
+      </div>
+      <div class="timeline-container" id="timelineContainer"><div class="timeline-line"></div></div>
+    </div>
+  </main>
+  <footer class="footer"><div class="container"><div class="footer-bottom"><p>ElectBot — AI Election Process Assistant &copy; 2025</p><button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">🚀 Back to Top</button></div></div></footer>
+  <script src="js/animations.js"></script>
+  <script>
+    const milestones = [
+      {title:'Election Announcement',date:'March 16, 2024',icon:'campaign',status:'past',summary:'Election Commission announces election dates. Model Code of Conduct begins.',detail:'The ECI announces the schedule for general elections, including phases, polling dates, and counting date. The Model Code of Conduct takes effect from announcement, restricting the ruling government from policy decisions that could influence voters.'},
+      {title:'Voter Registration Deadline',date:'March 25, 2024',icon:'app_registration',status:'past',summary:'Last date to register or update voter registration details.',detail:'Citizens must ensure registration in the electoral roll. New registrations via Form 6 on NVSP portal. Existing voters verify details and update changes through Form 8.'},
+      {title:'Nomination & Scrutiny',date:'March 28 – April 5, 2024',icon:'assignment_ind',status:'past',summary:'Candidates file nominations, scrutinized by Returning Officers.',detail:'Candidates file nomination papers with a security deposit. The Returning Officer scrutinizes each to verify eligibility. Candidates must disclose criminal cases, assets, liabilities, and education through affidavits.'},
+      {title:'Campaign Period',date:'April 6 – June 1, 2024',icon:'record_voice_over',status:'past',summary:'Political parties and candidates campaign. Ends 48 hours before polling.',detail:'Candidates conduct rallies, door-to-door campaigns, media ads. ECI monitors expenditure (cap ₹95 lakh per Lok Sabha candidate). Campaigning stops 48 hours before polling in each phase.'},
+      {title:'Polling (7 Phases)',date:'April 19 – June 1, 2024',icon:'how_to_vote',status:'past',summary:'Voters cast ballots at polling stations using EVMs across 7 phases.',detail:'2024 elections conducted in 7 phases across 543 constituencies. Voting 7 AM–6 PM. Voters need valid ID. Each voter presses the button next to their candidate on the EVM, VVPAT confirms the vote.'},
+      {title:'Vote Counting & Results',date:'June 4, 2024',icon:'analytics',status:'past',summary:'Votes counted electronically. Results declared constituency-wise.',detail:'Counting begins 8 AM in designated centers under CCTV. Postal ballots counted first, then EVM votes. 5 random VVPAT slips per assembly segment cross-verified. Results declared in real-time.'},
+      {title:'Government Formation',date:'June 9, 2024',icon:'account_balance',status:'past',summary:'New PM takes oath. Council of Ministers sworn in.',detail:'The leader of the winning party/alliance is appointed PM by the President. Swearing-in at Rashtrapati Bhavan. PM recommends Council of Ministers. New government proves majority on the floor of the House.'},
+      {title:'Next General Election',date:'April–May 2029 (Expected)',icon:'event_upcoming',status:'upcoming',summary:'Next Indian general elections expected in 2029.',detail:'The 18th Lok Sabha term extends until 2029. Elections conducted before term expires. ECI announces schedule ~6-8 weeks before polling. Stay registered and informed!'}
+    ];
+    const container = document.getElementById('timelineContainer');
+    milestones.forEach((m,i) => {
+      const item = document.createElement('div');
+      item.className = `timeline-item ${m.status} reveal`;
+      item.innerHTML = `<div class="timeline-dot"></div>
+        <div class="timeline-card" onclick="this.querySelector('.timeline-expand').classList.toggle('open')">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span class="material-symbols-outlined" style="font-size:18px;color:${m.status==='upcoming'?'var(--blue)':'var(--text-tertiary)'}">${m.icon}</span>
+            <span class="timeline-date">${m.date}</span>
+          </div>
+          <h3>${m.title}</h3>
+          <p style="font-size:.875rem;color:var(--text-secondary)">${m.summary}</p>
+          ${m.status==='upcoming'?`<div class="timeline-countdown" id="cd-${i}"><span class="material-symbols-outlined" style="font-size:14px">timer</span>Calculating...</div>`:''}
+          <div class="timeline-expand"><p>${m.detail}</p><a href="chat.html" class="btn btn-tonal" style="margin-top:var(--space-md);font-size:.8125rem;padding:8px 16px"><span class="material-symbols-outlined" style="font-size:16px">smart_toy</span>Ask ElectBot</a></div>
+        </div>`;
+      container.appendChild(item);
+    });
+    // Countdown
+    function updateCD(){milestones.forEach((m,i)=>{if(m.status!=='upcoming')return;const el=document.getElementById(`cd-${i}`);if(!el)return;const d=new Date('2029-04-15')-new Date();if(d<=0){el.textContent='Date passed';return;}const days=Math.floor(d/(864e5));el.innerHTML=`<span class="material-symbols-outlined" style="font-size:14px">timer</span>${days} days remaining`;});}
+    updateCD();setInterval(updateCD,60000);
+  </script>
+</body>
+</html>

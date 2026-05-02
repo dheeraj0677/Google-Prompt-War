@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElectBot — Your AI Election Process Assistant</title>
+  <meta name="description" content="Understand election processes, timelines, and voter registration with AI-powered guidance.">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/material.css">
+  <script src="js/config.js"></script>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${typeof CONFIG !== 'undefined' ? CONFIG.GA4_MEASUREMENT_ID : 'G-XXXXXXXXXX'}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    if (typeof CONFIG !== 'undefined' && CONFIG.GA4_MEASUREMENT_ID && CONFIG.GA4_MEASUREMENT_ID !== 'G-XXXXXXXXXX') {
+      gtag('config', CONFIG.GA4_MEASUREMENT_ID);
+    }
+  </script>
+</head>
+<body>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-logo">
+      <svg viewBox="0 0 64 64"><path d="M12 52V20a4 4 0 014-4h32a4 4 0 014 4v32a4 4 0 01-4 4H16a4 4 0 01-4-4zM24 16V8M40 16V8M22 32l6 6 14-14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="preloader-text">ElectBot</div>
+  </div>
+
+  <!-- Background layers -->
+  <div class="bg-gradient"></div>
+  <canvas id="particleCanvas"></canvas>
+  <div class="topo-overlay"></div>
+
+  <!-- Nav -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="chat.html">AI Chat</a></li>
+      <li><a href="timeline.html">Timeline</a></li>
+      <li><a href="guide.html">Voter Guide</a></li>
+      <li><a href="quiz.html">Quiz</a></li>
+      <li><a href="news.html">News</a></li>
+      <li><a href="map.html">Find Polls</a></li>
+      <li><a href="plan.html">My Plan</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button>
+  </nav>
+
+  <main class="page-content">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+
+      <div class="hero-badge"><span class="material-symbols-outlined" style="font-size:16px">smart_toy</span>Powered by Google Gemini AI</div>
+
+      <h1 class="hero-title">
+        <span class="word">Your</span> <span class="word">Vote.</span>
+        <span class="word">Your</span> <span class="word text-gradient">Voice.</span>
+        <span class="word">Your</span> <span class="word text-gradient">Power.</span>
+      </h1>
+
+      <p class="hero-subtitle"><span id="typewriterText"></span><span class="typewriter-cursor"></span></p>
+
+      <div class="hero-actions">
+        <a href="chat.html" class="btn btn-primary" id="heroChatBtn"><span class="material-symbols-outlined">chat</span>Start Learning</a>
+        <a href="map.html" class="btn btn-secondary" id="heroMapBtn"><span class="material-symbols-outlined">location_on</span>Find Polling Station</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="stat-value" data-target="968">0</span><span class="stat-label">Million Registered Voters</span></div>
+        <div class="hero-stat"><span class="stat-value" data-target="543">0</span><span class="stat-label">Constituencies</span></div>
+        <div class="hero-stat"><span class="stat-value" data-target="1035918">0</span><span class="stat-label">Polling Stations</span></div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section container" id="features">
+      <div class="section-header">
+        <h2>Everything You Need to <span class="text-gradient">Participate</span></h2>
+        <p>Interactive tools and AI-powered guidance for every step of the election process.</p>
+      </div>
+      <div class="features-grid stagger">
+        <a href="chat.html" class="feature-card reveal"><div class="feature-icon gold"><span class="material-symbols-outlined">smart_toy</span></div><h3>AI Election Assistant</h3><p>Ask anything about elections. Get instant, accurate answers powered by Google Gemini AI.</p></a>
+        <a href="timeline.html" class="feature-card reveal"><div class="feature-icon blue"><span class="material-symbols-outlined">timeline</span></div><h3>Election Timeline</h3><p>Visual step-by-step timeline from registration to inauguration with countdown timers.</p></a>
+        <a href="guide.html" class="feature-card reveal"><div class="feature-icon mint"><span class="material-symbols-outlined">checklist</span></div><h3>Voter Registration Guide</h3><p>Interactive checklist to help you register, verify, and prepare for election day.</p></a>
+        <a href="quiz.html" class="feature-card reveal"><div class="feature-icon gold"><span class="material-symbols-outlined">quiz</span></div><h3>Election Quiz</h3><p>Test your knowledge about elections and democracy with our interactive quiz.</p></a>
+        <a href="map.html" class="feature-card reveal"><div class="feature-icon blue"><span class="material-symbols-outlined">location_on</span></div><h3>Polling Station Finder</h3><p>Find nearby polling stations on Google Maps with directions and accessibility info.</p></a>
+        <a href="news.html" class="feature-card reveal"><div class="feature-icon mint"><span class="material-symbols-outlined">newspaper</span></div><h3>Election News & Data</h3><p>Stay updated with curated election news and interactive voter turnout charts.</p></a>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="section container">
+      <div class="section-header">
+        <h2>India's Democracy in <span class="text-gradient">Numbers</span></h2>
+        <p>The world's largest democracy — key statistics from recent elections.</p>
+      </div>
+      <div class="stats-grid stagger">
+        <div class="stat-card reveal"><span class="material-symbols-outlined">groups</span><span class="stat-number" data-target="67.4">0</span><span class="stat-desc">% Voter Turnout (2024)</span></div>
+        <div class="stat-card reveal"><span class="material-symbols-outlined">how_to_vote</span><span class="stat-number" data-target="642">0</span><span class="stat-desc">Million Votes Cast</span></div>
+        <div class="stat-card reveal"><span class="material-symbols-outlined">calendar_month</span><span class="stat-number" data-target="44">0</span><span class="stat-desc">Days of Voting (7 Phases)</span></div>
+        <div class="stat-card reveal"><span class="material-symbols-outlined">security</span><span class="stat-number" data-target="5.5">0</span><span class="stat-desc">Million Security Personnel</span></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section container">
+      <div class="cta-section">
+        <h2>Ready to Be an <span class="text-gradient">Informed Voter</span>?</h2>
+        <p>Start a conversation with ElectBot to learn about the election process, or explore our interactive tools.</p>
+        <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;margin-top:var(--space-xl)">
+          <a href="chat.html" class="btn btn-primary"><span class="material-symbols-outlined">chat</span>Ask ElectBot</a>
+          <a href="timeline.html" class="btn btn-secondary"><span class="material-symbols-outlined">timeline</span>View Timeline</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Powered By -->
+    <section class="section container">
+      <div class="powered-by">
+        <span>Powered By</span>
+        <div class="powered-item"><span class="material-symbols-outlined" style="color:var(--gold)">smart_toy</span>Gemini AI</div>
+        <div class="powered-item"><span class="material-symbols-outlined" style="color:var(--blue)">local_fire_department</span>Firebase</div>
+        <div class="powered-item"><span class="material-symbols-outlined" style="color:var(--mint)">location_on</span>Google Maps</div>
+        <div class="powered-item"><span class="material-symbols-outlined" style="color:var(--gold)">bar_chart</span>Google Charts</div>
+        <div class="powered-item"><span class="material-symbols-outlined" style="color:var(--blue)">translate</span>Google Translate</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col"><h4>Features</h4><a href="chat.html">AI Assistant</a><a href="timeline.html">Election Timeline</a><a href="guide.html">Voter Guide</a><a href="quiz.html">Election Quiz</a></div>
+        <div class="footer-col"><h4>Tools</h4><a href="map.html">Polling Finder</a><a href="news.html">Election News</a><a href="plan.html">My Voting Plan</a></div>
+        <div class="footer-col"><h4>Resources</h4><a href="https://eci.gov.in" target="_blank" rel="noopener">Election Commission</a><a href="https://voters.eci.gov.in" target="_blank" rel="noopener">Voter Portal</a><a href="https://nvsp.in" target="_blank" rel="noopener">NVSP</a></div>
+        <div class="footer-col"><h4>About</h4><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">About ElectBot</a></div>
+      </div>
+      <div class="footer-bottom">
+        <p>ElectBot — AI Election Process Assistant &copy; 2025. Built with Google Technologies.</p>
+        <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">🚀 Back to Top</button>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="js/animations.js"></script>
+  <script>
+    // Typewriter
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('typewriterText');
+      if (el) new Typewriter(el, [
+        'Understand the election process...',
+        'Find your polling station...',
+        'Know your voting rights...',
+        'Make your vote count...'
+      ], 50, 2000);
+    });
+  </script>
+</body>
+</html>
