@@ -4,6 +4,7 @@
   <script src="js/config.js"></script>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Election Quiz — ElectBot</title>
+  <meta name="description" content="Test your knowledge about Indian elections with our interactive quiz featuring instant feedback and explanations.">
   <link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/material.css">
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA4_MEASUREMENT_ID}"></script>
@@ -31,7 +32,7 @@
       <div id="resultArea" style="display:none"><div class="quiz-question-card quiz-result"><div class="quiz-score-circle" id="scoreCircle" style="--score:0"><div class="quiz-score-inner"><span class="score-num" id="finalScore">0</span><span class="score-label">out of 10</span></div></div><h2 id="resultMessage" style="margin-top:var(--space-lg)"></h2><p id="resultDescription" style="margin:var(--space-md) auto"></p><div style="display:flex;gap:var(--space-md);justify-content:center;margin-top:var(--space-xl);flex-wrap:wrap"><button class="btn btn-primary" onclick="restartQuiz()"><span class="material-symbols-outlined">refresh</span>Try Again</button><a href="chat.html" class="btn btn-secondary"><span class="material-symbols-outlined">smart_toy</span>Learn More</a></div></div></div>
     </div>
   </main>
-  <footer class="footer"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p></div></div></footer>
+  <footer class="footer" role="contentinfo"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p></div></div></footer>
   <script src="js/quiz.js"></script>
   <script src="js/animations.js"></script>
   <script>

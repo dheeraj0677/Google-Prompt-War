@@ -4,6 +4,7 @@
   <script src="js/config.js"></script>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Election News — ElectBot</title>
+  <meta name="description" content="Stay informed with curated election news, voter turnout data, and interactive charts powered by Google Charts.">
   <link rel="stylesheet" href="css/main.css"><link rel="stylesheet" href="css/material.css">
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=${CONFIG.GA4_MEASUREMENT_ID}"></script>
@@ -33,7 +34,7 @@
         <button class="chip" onclick="filterNews('policy',this)">Policy</button>
         <button class="chip" onclick="filterNews('awareness',this)">Awareness</button>
       </div>
-      <div style="margin-bottom:var(--space-xl)"><input type="text" class="input-field" placeholder="Search news articles..." id="newsSearch" oninput="searchNews(this.value)"></div>
+      <div style="margin-bottom:var(--space-xl)"><input type="text" class="input-field" placeholder="Search news articles..." id="newsSearch" aria-label="Search news articles" oninput="searchNews(this.value)"></div>
       <div class="news-grid" id="newsGrid"></div>
     </div>
     <div class="container section">
@@ -44,7 +45,7 @@
       </div>
     </div>
   </main>
-  <footer class="footer"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p><button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">🚀 Back to Top</button></div></div></footer>
+  <footer class="footer" role="contentinfo"><div class="container"><div class="footer-bottom"><p>ElectBot &copy; 2025</p><button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll back to top">🚀 Back to Top</button></div></div></footer>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script src="js/animations.js"></script>
   <script>

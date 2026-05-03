@@ -1,17 +1,38 @@
+/**
+ * ElectBot — Configuration Injector
+ *
+ * Build-time script that generates public/js/config.js from environment
+ * variables. Used during deployment on platforms like Render, Vercel,
+ * or Firebase to securely inject API keys without committing them.
+ *
+ * @module inject-config
+ * @version 2.0.0
+ *
+ * @example
+ * // Run during build:
+ * // GEMINI_API_KEY=xxx node inject-config.js
+ */
+
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
 
-/**
- * This script generates public/js/config.js from environment variables
- * during the build process on platforms like Render or Vercel.
- */
-
+/** @type {string} Output path for the generated config file */
 const configPath = path.join(__dirname, 'public', 'js', 'config.js');
 
+/**
+ * Generate the config file content from environment variables.
+ * Falls back to placeholder values when env vars are not set.
+ * @type {string}
+ */
 const configContent = `/**
  * ElectBot — Configuration
- * Generated automatically during build.
+ * Auto-generated during build. Do NOT commit this file.
+ * @see inject-config.js
  */
+
+'use strict';
 
 const CONFIG = {
   GEMINI_API_KEY: '${process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY'}',
@@ -32,7 +53,7 @@ if (typeof module !== 'undefined') {
 }
 `;
 
-// Ensure the directory exists
+// Ensure the output directory exists
 const dir = path.dirname(configPath);
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true });

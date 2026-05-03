@@ -1,8 +1,16 @@
 /**
  * ElectBot — Quiz Engine
- * Manages election knowledge quiz with scoring and explanations
+ * Manages election knowledge quiz with scoring and explanations.
+ * @module quiz
+ * @version 2.0.0
  */
 
+'use strict';
+
+/**
+ * Quiz questions array with options, correct index, and explanations.
+ * @type {Array<{question: string, options: string[], correct: number, explanation: string}>}
+ */
 const QUIZ_QUESTIONS = [
   {
     question: "What is the minimum age to vote in Indian elections?",
@@ -36,52 +44,44 @@ const QUIZ_QUESTIONS = [
   },
   {
     question: "What is the Model Code of Conduct (MCC)?",
-    options: [
-      "The Constitution of India",
-      "Guidelines for political parties during elections",
-      "Rules for counting votes",
-      "A training manual for election officers"
-    ],
+    options: ["The Constitution of India", "Guidelines for political parties during elections", "Rules for counting votes", "A training manual for election officers"],
     correct: 1,
-    explanation: "The Model Code of Conduct is a set of guidelines issued by the ECI to regulate political parties and candidates during elections. It comes into force from the date of election announcement and remains until results are declared. It prevents misuse of government machinery and ensures free and fair elections."
+    explanation: "The Model Code of Conduct is a set of guidelines issued by the ECI to regulate political parties and candidates during elections. It comes into force from the date of election announcement and remains until results are declared."
   },
   {
     question: "What does VVPAT stand for?",
-    options: [
-      "Voter Verification and Polling Audit Trail",
-      "Voter Verifiable Paper Audit Trail",
-      "Vote Validation Paper Authentication Tool",
-      "Verified Voter Paper Audit Technique"
-    ],
+    options: ["Voter Verification and Polling Audit Trail", "Voter Verifiable Paper Audit Trail", "Vote Validation Paper Authentication Tool", "Verified Voter Paper Audit Technique"],
     correct: 1,
-    explanation: "VVPAT stands for Voter Verifiable Paper Audit Trail. It's a machine attached to EVMs that prints a slip showing the voter's choice for 7 seconds, allowing verification. The Supreme Court mandated VVPAT verification of 5 random EVMs per assembly segment."
+    explanation: "VVPAT stands for Voter Verifiable Paper Audit Trail. It's a machine attached to EVMs that prints a slip showing the voter's choice for 7 seconds, allowing verification."
   },
   {
     question: "Which form is used for new voter registration in India?",
     options: ["Form 2", "Form 6", "Form 8", "Form 10"],
     correct: 1,
-    explanation: "Form 6 is used for new voter registration. Form 7 is for objections to inclusion of a name, Form 8 is for corrections/updates to existing entries, and Form 8A is for transposition of entries within the same constituency."
+    explanation: "Form 6 is used for new voter registration. Form 7 is for objections to inclusion of a name, Form 8 is for corrections/updates to existing entries, and Form 8A is for transposition."
   },
   {
     question: "What is the 'silence period' before an election?",
-    options: [
-      "24 hours before polling",
-      "48 hours before polling",
-      "72 hours before polling",
-      "1 week before polling"
-    ],
+    options: ["24 hours before polling", "48 hours before polling", "72 hours before polling", "1 week before polling"],
     correct: 1,
-    explanation: "The silence period is 48 hours before polling day, during which all campaigning must stop. This gives voters time to reflect on their choices without external influence. Violation of this rule can lead to disqualification of candidates."
+    explanation: "The silence period is 48 hours before polling day, during which all campaigning must stop. This gives voters time to reflect on their choices without external influence."
   },
   {
     question: "What is the maximum expenditure limit for a Lok Sabha candidate?",
     options: ["₹40 lakh", "₹70 lakh", "₹95 lakh", "₹1 crore"],
     correct: 2,
-    explanation: "As per the ECI's 2022 revision, the maximum election expenditure for a Lok Sabha candidate is ₹95 lakh (₹75 lakh in smaller states). For state assembly elections, it ranges from ₹28 lakh to ₹40 lakh. The ECI appoints expenditure observers to monitor compliance."
+    explanation: "As per the ECI's 2022 revision, the maximum election expenditure for a Lok Sabha candidate is ₹95 lakh (₹75 lakh in smaller states). The ECI appoints expenditure observers to monitor compliance."
   }
 ];
 
+/** @type {number} Index of the currently displayed question */
 let currentQuestion = 0;
+
+/** @type {number} User's current score */
 let score = 0;
+
+/** @type {boolean} Whether the current question has been answered */
 let answered = false;
+
+/** @type {Array<{question: number, selected: number, correct: boolean}>} */
 let userAnswers = [];
