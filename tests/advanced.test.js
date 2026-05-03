@@ -160,3 +160,89 @@ describe('Google Services — Gemini model is current', () => {
   const gemini = fs.readFileSync(path.join(jsDir, 'gemini.js'), 'utf-8');
   assertIncludes(gemini, 'gemini-2.0-flash', 'Uses gemini-2.0-flash model');
 });
+
+// ═══════════════════════════════════════
+// ACCESSIBILITY — Skip links & navigation
+// ═══════════════════════════════════════
+
+describe('Accessibility — All pages have skip-to-content link', () => {
+  htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(publicDir, file), 'utf-8');
+    assertIncludes(content, 'skip-link', `${file}: has skip-to-content link`);
+  });
+});
+
+describe('Accessibility — All navs have role=navigation', () => {
+  htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(publicDir, file), 'utf-8');
+    if (content.includes('<nav')) {
+      assertIncludes(content, 'role="navigation"', `${file}: nav has role="navigation"`);
+    }
+  });
+});
+
+describe('Accessibility — Active links have aria-current=page', () => {
+  htmlFiles.forEach(file => {
+    const content = fs.readFileSync(path.join(publicDir, file), 'utf-8');
+    if (content.includes('class="active"')) {
+      assertIncludes(content, 'aria-current="page"', `${file}: active link has aria-current="page"`);
+    }
+  });
+});
+
+describe('Accessibility — CSS has prefers-reduced-motion', () => {
+  const css = fs.readFileSync(path.join(publicDir, 'css', 'main.css'), 'utf-8');
+  assertIncludes(css, 'prefers-reduced-motion', 'CSS respects prefers-reduced-motion');
+});
+
+describe('Accessibility — CSS has focus-visible styles', () => {
+  const css = fs.readFileSync(path.join(publicDir, 'css', 'main.css'), 'utf-8');
+  assertIncludes(css, 'focus-visible', 'CSS has focus-visible outline styles');
+});
+
+describe('Accessibility — CSS has skip-link styles', () => {
+  const css = fs.readFileSync(path.join(publicDir, 'css', 'main.css'), 'utf-8');
+  assertIncludes(css, '.skip-link', 'CSS has skip-link styles');
+});
+
+// ═══════════════════════════════════════
+// CODE QUALITY — Project tooling files
+// ═══════════════════════════════════════
+
+describe('Code Quality — Project has ESLint config', () => {
+  const eslintPath = path.join(__dirname, '..', '.eslintrc.json');
+  assert(fs.existsSync(eslintPath), '.eslintrc.json exists');
+  const config = JSON.parse(fs.readFileSync(eslintPath, 'utf-8'));
+  assertType(config.rules, 'object', 'ESLint config has rules');
+  assert(config.rules['no-eval'] === 'error', 'ESLint bans eval()');
+});
+
+describe('Code Quality — Project has EditorConfig', () => {
+  const editorPath = path.join(__dirname, '..', '.editorconfig');
+  assert(fs.existsSync(editorPath), '.editorconfig exists');
+});
+
+describe('Code Quality — Project has LICENSE', () => {
+  const licensePath = path.join(__dirname, '..', 'LICENSE');
+  assert(fs.existsSync(licensePath), 'LICENSE file exists');
+  const content = fs.readFileSync(licensePath, 'utf-8');
+  assertIncludes(content, 'MIT License', 'License is MIT');
+});
+
+describe('Code Quality — Project has CONTRIBUTING.md', () => {
+  const contribPath = path.join(__dirname, '..', 'CONTRIBUTING.md');
+  assert(fs.existsSync(contribPath), 'CONTRIBUTING.md exists');
+});
+
+describe('Code Quality — Project has CHANGELOG.md', () => {
+  const changelogPath = path.join(__dirname, '..', 'CHANGELOG.md');
+  assert(fs.existsSync(changelogPath), 'CHANGELOG.md exists');
+});
+
+describe('Code Quality — All JS constants use UPPER_CASE', () => {
+  const animations = fs.readFileSync(path.join(jsDir, 'animations.js'), 'utf-8');
+  assertIncludes(animations, 'PARTICLE_COUNT_MOBILE', 'animations.js extracts constants');
+  assertIncludes(animations, 'MOBILE_BREAKPOINT', 'animations.js has MOBILE_BREAKPOINT constant');
+  const stations = fs.readFileSync(path.join(jsDir, 'stations-data.js'), 'utf-8');
+  assertIncludes(stations, 'BOOTH_COUNT', 'stations-data.js extracts BOOTH_COUNT constant');
+});

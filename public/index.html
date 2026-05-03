@@ -20,6 +20,7 @@
   </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <!-- Preloader -->
   <div class="preloader" id="preloader">
     <div class="preloader-logo">
@@ -34,11 +35,11 @@
   <div class="topo-overlay" aria-hidden="true"></div>
 
   <!-- Nav -->
-  <nav class="navbar" id="navbar">
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
     <a href="index.html" class="nav-brand" aria-label="ElectBot Home"><span class="material-symbols-outlined" aria-hidden="true">how_to_vote</span>ElectBot</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     <ul class="nav-links" id="navLinks">
-      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="index.html" class="active" aria-current="page">Home</a></li>
       <li><a href="chat.html">AI Chat</a></li>
       <li><a href="timeline.html">Timeline</a></li>
       <li><a href="guide.html">Voter Guide</a></li>
@@ -50,7 +51,7 @@
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span></button>
   </nav>
 
-  <main class="page-content" role="main">
+  <main class="page-content" role="main" id="main-content">
     <!-- Hero -->
     <section class="hero">
       <div class="hero-orb hero-orb-1"></div>

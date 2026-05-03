@@ -1,0 +1,27 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "script"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-undef": "warn",
+    "eqeqeq": "error",
+    "no-var": "error",
+    "prefer-const": "warn",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "strict": ["error", "global"],
+    "no-alert": "warn",
+    "no-console": "off",
+    "curly": "error",
+    "no-throw-literal": "error",
+    "prefer-template": "warn"
+  }
+}

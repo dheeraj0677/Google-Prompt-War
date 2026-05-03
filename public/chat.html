@@ -20,14 +20,15 @@
   </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <div class="bg-gradient"></div>
   <canvas id="particleCanvas" aria-hidden="true"></canvas>
 
-  <nav class="navbar" id="navbar">
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
     <a href="index.html" class="nav-brand" aria-label="ElectBot Home"><span class="material-symbols-outlined" aria-hidden="true">how_to_vote</span>ElectBot</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     <ul class="nav-links" id="navLinks">
-      <li><a href="index.html">Home</a></li><li><a href="chat.html" class="active">AI Chat</a></li>
+      <li><a href="index.html">Home</a></li><li><a href="chat.html" class="active" aria-current="page">AI Chat</a></li>
       <li><a href="timeline.html">Timeline</a></li><li><a href="guide.html">Voter Guide</a></li>
       <li><a href="quiz.html">Quiz</a></li><li><a href="news.html">News</a></li>
       <li><a href="map.html">Find Polls</a></li><li><a href="plan.html">My Plan</a></li>
@@ -35,7 +36,7 @@
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span></button>
   </nav>
 
-  <main class="chat-layout" role="main">
+  <main class="chat-layout" role="main" id="main-content">
     <aside class="chat-sidebar" id="chatSidebar">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg)">
         <h3 style="margin:0">Suggested Topics</h3>
