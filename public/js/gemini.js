@@ -1,10 +1,28 @@
 /**
- * ElectBot — Gemini AI Integration
- * Handles all communication with Google Gemini API
+ * ElectBot — Gemini AI Integration Module
+ * 
+ * This module handles all communication with the Google Gemini API,
+ * including message formatting, error handling, and fallback responses.
+ * 
+ * @module gemini
+ * @requires CONFIG - Global configuration object from config.js
+ * @see https://ai.google.dev/gemini-api/docs
  */
 
+'use strict';
+
+/**
+ * Gemini API key loaded from centralized configuration.
+ * Falls back to placeholder if CONFIG is not available.
+ * @type {string}
+ */
 const GEMINI_API_KEY = typeof CONFIG !== 'undefined' ? CONFIG.GEMINI_API_KEY : 'YOUR_GEMINI_API_KEY';
 
+/**
+ * System prompt that defines ElectBot's persona and behavioral guidelines.
+ * This prompt is sent with every API request to maintain consistent responses.
+ * @type {string}
+ */
 const SYSTEM_PROMPT = `You are ElectBot, a friendly, nonpartisan election assistant. Help users understand voter registration, polling, ballot casting, results, and democratic processes. Always be neutral, factual, and encouraging.
 
 Key guidelines:
@@ -17,63 +35,129 @@ Key guidelines:
 - Keep responses concise but informative (under 300 words unless asked for detail)
 - Use emoji sparingly for friendliness 🗳️`;
 
+/**
+ * Stores the ongoing conversation history for multi-turn context.
+ * Each entry follows the Gemini API format: { role: string, parts: [{ text: string }] }
+ * @type {Array<{role: string, parts: Array<{text: string}>}>}
+ */
 let conversationHistory = [];
 
 /**
- * Send a message to Gemini API and get a response
- * @param {string} userMessage - The user's message
- * @returns {Promise<string>} - The AI response
+ * Maximum number of retry attempts for API failures.
+ * @type {number}
+ */
+const MAX_RETRIES = 2;
+
+/**
+ * Send a message to the Gemini API and get an AI-generated response.
+ * Implements retry logic with exponential backoff for transient failures.
+ * Falls back to pre-built responses when the API is unavailable.
+ * 
+ * @param {string} userMessage - The user's message to send to the AI
+ * @returns {Promise<string>} The AI-generated response text
+ * @throws {Error} Only if all retries and fallback fail (should not happen)
+ * 
+ * @example
+ * const response = await sendToGemini('How do I register to vote?');
+ * console.log(response); // Detailed registration guide
  */
 async function sendToGemini(userMessage) {
   conversationHistory.push({ role: 'user', parts: [{ text: userMessage }] });
 
-  // Check if API key is set
+  // Check if API key is configured
   if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY') {
     return getFallbackResponse(userMessage);
   }
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: conversationHistory,
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          generationConfig: {
-            temperature: 0.7,
-            topP: 0.9,
-            topK: 40,
-            maxOutputTokens: 1024,
-          },
-          safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
-          ]
-        })
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: conversationHistory,
+            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            generationConfig: {
+              temperature: 0.7,
+              topP: 0.9,
+              topK: 40,
+              maxOutputTokens: 1024,
+            },
+            safetySettings: [
+              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+            ]
+          })
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => 'Unknown error');
+        
+        // Handle specific HTTP error codes
+        if (response.status === 429) {
+          console.warn(`Gemini API rate limited (attempt ${attempt + 1}/${MAX_RETRIES + 1})`);
+          if (attempt < MAX_RETRIES) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+            continue;
+          }
+        }
+        
+        if (response.status === 403) {
+          console.error('Gemini API key is invalid or restricted.');
+          return getFallbackResponse(userMessage);
+        }
+
+        throw new Error(`API Error ${response.status}: ${errorBody}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      const data = await response.json();
+      
+      // Validate response structure
+      const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!aiText) {
+        console.warn('Empty response from Gemini API:', JSON.stringify(data));
+        return getFallbackResponse(userMessage);
+      }
+
+      conversationHistory.push({ role: 'model', parts: [{ text: aiText }] });
+      return aiText;
+
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.error('Gemini API request timed out');
+      } else {
+        console.error(`Gemini API Error (attempt ${attempt + 1}):`, error.message);
+      }
+
+      if (attempt === MAX_RETRIES) {
+        return getFallbackResponse(userMessage);
+      }
+
+      // Exponential backoff before retry
+      await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, attempt)));
     }
-
-    const data = await response.json();
-    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I apologize, I could not generate a response. Please try again.';
-
-    conversationHistory.push({ role: 'model', parts: [{ text: aiText }] });
-    return aiText;
-  } catch (error) {
-    console.error('Gemini API Error:', error);
-    return getFallbackResponse(userMessage);
   }
+
+  return getFallbackResponse(userMessage);
 }
 
 /**
- * Fallback responses when API key is not configured
+ * Provides pre-built responses when the Gemini API is unavailable.
+ * Uses keyword matching to route queries to relevant informational content.
+ * 
+ * @param {string} query - The user's original query
+ * @returns {string} A markdown-formatted response matching the query topic
  */
 function getFallbackResponse(query) {
   const q = query.toLowerCase();
@@ -193,14 +277,23 @@ I can help you with:
 }
 
 /**
- * Clear conversation history
+ * Clears the conversation history to start a fresh chat session.
+ * This resets the multi-turn context sent to the Gemini API.
  */
 function clearConversation() {
   conversationHistory = [];
 }
 
 /**
- * Simple markdown to HTML converter
+ * Converts a subset of markdown syntax to safe HTML for rendering in the chat.
+ * Supports: headings (##), bold (**), italic (*), code (`), links, and lists.
+ * 
+ * @param {string} text - Markdown-formatted text from the AI response
+ * @returns {string} HTML string safe for rendering in message bubbles
+ * 
+ * @example
+ * markdownToHtml('**Hello** world');
+ * // Returns: '<strong>Hello</strong> world'
  */
 function markdownToHtml(text) {
   return text
@@ -208,7 +301,7 @@ function markdownToHtml(text) {
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
     .replace(/^- (.*?)$/gm, '<li>$1</li>')
     .replace(/^(\d+)\. (.*?)$/gm, '<li>$2</li>')
     .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
@@ -217,7 +310,16 @@ function markdownToHtml(text) {
 }
 
 /**
- * Sanitize user input
+ * Sanitizes user input to prevent Cross-Site Scripting (XSS) attacks.
+ * Uses the browser's built-in DOM text encoding to escape dangerous characters.
+ * Truncates input to a maximum of 2000 characters.
+ * 
+ * @param {string} input - Raw user input string
+ * @returns {string} HTML-escaped, length-limited safe string
+ * 
+ * @example
+ * sanitizeInput('<script>alert("xss")</script>');
+ * // Returns: '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
  */
 function sanitizeInput(input) {
   const div = document.createElement('div');

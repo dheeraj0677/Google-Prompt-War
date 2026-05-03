@@ -21,10 +21,10 @@
 </head>
 <body>
   <div class="bg-gradient"></div>
-  <canvas id="particleCanvas"></canvas>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
 
   <nav class="navbar" id="navbar">
-    <a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a>
+    <a href="index.html" class="nav-brand" aria-label="ElectBot Home"><span class="material-symbols-outlined" aria-hidden="true">how_to_vote</span>ElectBot</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li><li><a href="chat.html" class="active">AI Chat</a></li>
@@ -32,10 +32,10 @@
       <li><a href="quiz.html">Quiz</a></li><li><a href="news.html">News</a></li>
       <li><a href="map.html">Find Polls</a></li><li><a href="plan.html">My Plan</a></li>
     </ul>
-    <button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span></button>
   </nav>
 
-  <div class="chat-layout">
+  <main class="chat-layout" role="main">
     <aside class="chat-sidebar" id="chatSidebar">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg)">
         <h3 style="margin:0">Suggested Topics</h3>
@@ -65,7 +65,7 @@
         </button>
       </div>
 
-      <div class="chat-messages" id="chatMessages">
+      <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
         <div class="chat-message bot">
           <div class="message-avatar bot-avatar"><span class="material-symbols-outlined" style="font-size:16px">smart_toy</span></div>
           <div class="message-bubble">
@@ -87,7 +87,7 @@
         <button class="chat-send-btn" id="sendBtn" onclick="handleSend()" aria-label="Send message"><span class="material-symbols-outlined">send</span></button>
       </div>
     </div>
-  </div>
+  </main>
 
   <script src="js/gemini.js"></script>
   <script src="js/animations.js"></script>

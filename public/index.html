@@ -30,12 +30,12 @@
 
   <!-- Background layers -->
   <div class="bg-gradient"></div>
-  <canvas id="particleCanvas"></canvas>
-  <div class="topo-overlay"></div>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <div class="topo-overlay" aria-hidden="true"></div>
 
   <!-- Nav -->
   <nav class="navbar" id="navbar">
-    <a href="index.html" class="nav-brand"><span class="material-symbols-outlined">how_to_vote</span>ElectBot</a>
+    <a href="index.html" class="nav-brand" aria-label="ElectBot Home"><span class="material-symbols-outlined" aria-hidden="true">how_to_vote</span>ElectBot</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span class="material-symbols-outlined">menu</span></button>
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html" class="active">Home</a></li>
@@ -47,10 +47,10 @@
       <li><a href="map.html">Find Polls</a></li>
       <li><a href="plan.html">My Plan</a></li>
     </ul>
-    <button class="theme-toggle" id="themeToggle" aria-label="Theme"><span class="material-symbols-outlined">auto_awesome</span></button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span></button>
   </nav>
 
-  <main class="page-content">
+  <main class="page-content" role="main">
     <!-- Hero -->
     <section class="hero">
       <div class="hero-orb hero-orb-1"></div>
@@ -68,8 +68,8 @@
       <p class="hero-subtitle"><span id="typewriterText"></span><span class="typewriter-cursor"></span></p>
 
       <div class="hero-actions">
-        <a href="chat.html" class="btn btn-primary" id="heroChatBtn"><span class="material-symbols-outlined">chat</span>Start Learning</a>
-        <a href="map.html" class="btn btn-secondary" id="heroMapBtn"><span class="material-symbols-outlined">location_on</span>Find Polling Station</a>
+        <a href="chat.html" class="btn btn-primary" id="heroChatBtn" aria-label="Start learning with AI chat"><span class="material-symbols-outlined" aria-hidden="true">chat</span>Start Learning</a>
+        <a href="map.html" class="btn btn-secondary" id="heroMapBtn" aria-label="Find your polling station on map"><span class="material-symbols-outlined" aria-hidden="true">location_on</span>Find Polling Station</a>
       </div>
 
       <div class="hero-stats">
@@ -135,7 +135,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="footer">
+  <footer class="footer" role="contentinfo">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col"><h4>Features</h4><a href="chat.html">AI Assistant</a><a href="timeline.html">Election Timeline</a><a href="guide.html">Voter Guide</a><a href="quiz.html">Election Quiz</a></div>
@@ -145,7 +145,7 @@
       </div>
       <div class="footer-bottom">
         <p>ElectBot — AI Election Process Assistant &copy; 2025. Built with Google Technologies.</p>
-        <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">🚀 Back to Top</button>
+        <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll back to top">🚀 Back to Top</button>
       </div>
     </div>
   </footer>

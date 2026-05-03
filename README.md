@@ -116,8 +116,39 @@ firebase deploy
 
 ---
 
-## 🔒 Security Note
-A `.gitignore` has been included to prevent `public/js/config.js` from being pushed to public repositories. **Always restrict your API keys** to your specific domain in the Google Cloud Console for production use.
+## 🔒 Security Compliance
+- **API Key Protection**: `public/js/config.js` is gitignored; keys are injected at build time via `inject-config.js`.
+- **XSS Prevention**: All user inputs are sanitized using DOM `textContent` encoding before rendering.
+- **External Links**: All `target="_blank"` links include `rel="noopener noreferrer"` to prevent reverse tabnapping.
+- **Safety Filters**: Gemini API requests include `safetySettings` to block harmful content at `BLOCK_MEDIUM_AND_ABOVE`.
+- **Input Limits**: User chat input is truncated to 2000 characters to prevent abuse.
+- **CORS & CSP**: Firebase hosting config includes CORS headers. Restrict API keys to your domain in the Google Cloud Console.
+
+---
+
+## 🧪 Testing
+
+ElectBot includes a comprehensive test suite covering logic, data integrity, accessibility, and security:
+
+```bash
+npm test
+```
+
+Test suites:
+- **`tests/gemini.test.js`** — Markdown conversion, XSS prevention, fallback routing
+- **`tests/quiz.test.js`** — Quiz data integrity, scoring logic, answer validation
+- **`tests/config.test.js`** — Config structure, HTML accessibility compliance, security checks, file structure
+
+---
+
+## ♿ Accessibility
+
+- All pages use semantic HTML5 elements (`<main>`, `<nav>`, `<footer>`, `<article>`)
+- ARIA labels on all interactive elements (buttons, links, form controls)
+- Decorative elements marked with `aria-hidden="true"`
+- Chat messages area has `role="log"` and `aria-live="polite"` for screen readers
+- Keyboard-navigable interface with visible focus indicators
+- Responsive design supporting all screen sizes
 
 ---
 
